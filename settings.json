@@ -1,0 +1,15 @@
+{
+    "barHeight": 35,
+    "barMargin": 10,
+    "idleDimEnabled": true,
+    "idleDimOpacity": 0.95,
+    "idleTimeoutSeconds": 180,
+    "launcherHeight": 420,
+    "launcherWidth": 420,
+    "radius": 0,
+    "showActiveWindow": true,
+    "showClock": true,
+    "showOpenWindows": true,
+    "showTray": true,
+    "showVolume": true
+}

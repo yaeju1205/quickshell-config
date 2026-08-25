@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+# Controls the quickshell app launcher / settings / power overlay via IPC.
+# Usage: launcherctl <open|toggle|settings|toggle-settings|power|toggle-power|close> [--wait]
+set -euo pipefail
+
+usage() {
+    cat <<'EOF'
+Usage: launcherctl <command>
+
+Commands:
+  open              Open the app launcher
+  toggle            Toggle the app launcher (default)
+  settings          Open the settings window
+  toggle-settings   Toggle the settings window
+  power             Open the power / session window
+  toggle-power      Toggle the power / session window
+  close             Close whatever overlay is open
+
+Requires a running quickshell instance for this config
+(~/.config/quickshell/shell.qml). Start it first, e.g.:
+  quickshell -d
+EOF
+}
+
+cmd="${1:-toggle}"
+
+case "$cmd" in
+    open)             quickshell ipc call overlay openLauncher ;;
+    toggle)           quickshell ipc call overlay toggleLauncher ;;
+    settings)         quickshell ipc call overlay openSettings ;;
+    toggle-settings)  quickshell ipc call overlay toggleSettings ;;
+    power)            quickshell ipc call overlay openPower ;;
+    toggle-power)     quickshell ipc call overlay togglePower ;;
+    close)            quickshell ipc call overlay close ;;
+    -h|--help|help)   usage ;;
+    *)
+        echo "Unknown command: $cmd" >&2
+        usage >&2
+        exit 1
+        ;;
+esac
