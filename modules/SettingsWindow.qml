@@ -178,6 +178,14 @@ PanelWindow {
             }
 
             SettingRow {
+                label: "  ㄴ 현재 워크스페이스만"
+                ToggleSwitch {
+                    checked: Settings.openWindowsCurrentWorkspaceOnly
+                    onToggled: Settings.openWindowsCurrentWorkspaceOnly = !Settings.openWindowsCurrentWorkspaceOnly
+                }
+            }
+
+            SettingRow {
                 label: "트레이"
                 ToggleSwitch {
                     checked: Settings.showTray

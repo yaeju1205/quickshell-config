@@ -13,7 +13,13 @@ Item {
     readonly property int maxWidth: 800
 
     readonly property var sortedToplevels: {
-        const items = Hyprland.toplevels.values.filter(t => t.monitor !== null && t.monitor.name === root.screenName);
+        const items = Hyprland.toplevels.values.filter(t => {
+            if (t.monitor === null || t.monitor.name !== root.screenName)
+                return false;
+            if (Settings.openWindowsCurrentWorkspaceOnly && (!t.workspace || !t.workspace.active))
+                return false;
+            return true;
+        });
         items.sort((a, b) => {
             const wsA = a.workspace ? a.workspace.id : 0;
             const wsB = b.workspace ? b.workspace.id : 0;

@@ -14,6 +14,7 @@ Singleton {
     property alias showClock: adapter.showClock
     property alias showActiveWindow: adapter.showActiveWindow
     property alias showOpenWindows: adapter.showOpenWindows
+    property alias openWindowsCurrentWorkspaceOnly: adapter.openWindowsCurrentWorkspaceOnly
     property alias showTray: adapter.showTray
     property alias showVolume: adapter.showVolume
     property alias idleDimEnabled: adapter.idleDimEnabled
@@ -29,6 +30,7 @@ Singleton {
         adapter.showClock = true;
         adapter.showActiveWindow = true;
         adapter.showOpenWindows = true;
+        adapter.openWindowsCurrentWorkspaceOnly = false;
         adapter.showTray = true;
         adapter.showVolume = true;
         adapter.idleDimEnabled = true;
@@ -55,6 +57,7 @@ Singleton {
             property bool showClock: true
             property bool showActiveWindow: true
             property bool showOpenWindows: true
+            property bool openWindowsCurrentWorkspaceOnly: false
             property bool showTray: true
             property bool showVolume: true
             property bool idleDimEnabled: true
