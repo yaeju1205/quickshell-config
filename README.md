@@ -1,5 +1,8 @@
 # quickshell config
 
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/1f366b99-1602-4fd4-b3b1-c5e034ac7b9f" />
+
+
 A personal [Quickshell](https://quickshell.org/) desktop shell for Hyprland — a top bar, app launcher, settings panel, power/session menu, and an idle-dim overlay, styled with the [blossom.vim](https://github.com/yaeju1205/blossom.vim) palette.
 
 ## Features
