@@ -12,8 +12,42 @@ Item {
     readonly property int pillHeight: 26
     readonly property int maxWidth: 800
 
+    // Quickshell 은 closewindow 이벤트로만 toplevel 을 제거하고, refreshToplevels()
+    // 응답에서 사라진 항목은 정리하지 않는다. 그래서 창을 닫는 순간에 j/clients
+    // 요청이 떠 있었다면 이미 죽은 주소가 다시 목록에 추가되어 영영 남는다.
+    // 닫힌 주소를 직접 기억해 두고 걸러낸다.
+    property var closedAddresses: []
+    readonly property int closedAddressLimit: 64
+
+    // wayland 핸들이 사라져도 변경 알림이 오지 않으므로, 주기 갱신 때 목록을 다시
+    // 계산하도록 바인딩이 의존할 값을 하나 둔다.
+    property int refreshTick: 0
+
+    function markClosed(address) {
+        if (!address)
+            return;
+        const next = root.closedAddresses.filter(a => a !== address);
+        next.push(address);
+        while (next.length > root.closedAddressLimit)
+            next.shift();
+        root.closedAddresses = next;
+    }
+
+    function markOpened(address) {
+        if (!address || !root.closedAddresses.includes(address))
+            return;
+        root.closedAddresses = root.closedAddresses.filter(a => a !== address);
+    }
+
     readonly property var sortedToplevels: {
+        const closed = root.closedAddresses;
+        void root.refreshTick;
         const items = Hyprland.toplevels.values.filter(t => {
+            if (closed.includes(t.address))
+                return false;
+            // 이미 닫힌 창은 wayland 핸들이 파괴되어 null 이 된다.
+            if (t.wayland === null)
+                return false;
             if (t.monitor === null || t.monitor.name !== root.screenName)
                 return false;
             if (Settings.openWindowsCurrentWorkspaceOnly && (!t.workspace || !t.workspace.active))
@@ -40,11 +74,38 @@ Item {
     Layout.preferredHeight: pillHeight
     Layout.maximumWidth: maxWidth
 
+    Connections {
+        target: Hyprland
+
+        function onRawEvent(event) {
+            if (event.name === "closewindow") {
+                root.markClosed(event.data.trim());
+            } else if (event.name === "openwindow") {
+                root.markOpened(event.parse(4)[0]);
+            }
+            refreshDebounce.restart();
+        }
+    }
+
+    // 이벤트 직후 위치(at) 정보를 다시 받아 정렬을 갱신한다.
+    Timer {
+        id: refreshDebounce
+        interval: 60
+        repeat: false
+        onTriggered: {
+            Hyprland.refreshToplevels();
+            root.refreshTick++;
+        }
+    }
+
     Timer {
         interval: 400
         running: true
         repeat: true
-        onTriggered: Hyprland.refreshToplevels()
+        onTriggered: {
+            Hyprland.refreshToplevels();
+            root.refreshTick++;
+        }
     }
 
     Flickable {
@@ -121,7 +182,10 @@ Item {
                         anchors.fill: parent
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
-                        onClicked: pill.modelData.wayland.activate()
+                        onClicked: {
+                            if (pill.modelData.wayland)
+                                pill.modelData.wayland.activate();
+                        }
                     }
                 }
             }
